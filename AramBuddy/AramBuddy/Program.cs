@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -29,7 +28,7 @@ namespace AramBuddy
 {
     internal class Program
     {
-        public static List<string> CurrentPatchs = new List<string> { "7.5.1", "7.2.1", "7.1.1" };
+        public static string[] CurrentPatchs =  { "7.6.1", "7.5.1", "7.2.1", "7.1.1" };
 
         private static string Texturefile = Misc.AramBuddyFolder + "\\temp\\DisableTexture1.dat";
 
@@ -229,7 +228,7 @@ namespace AramBuddy
                 BuildMenu = MenuIni.AddSubMenu("AutoShop Settings");
                 InfoMenu = MenuIni.AddSubMenu("Extra Options");
 
-                var lolversion = BuildMenu.Add("buildpatch", new ComboBox("Select Build Patch: ", 0, CurrentPatchs.ToArray()));
+                var lolversion = BuildMenu.Add("buildpatch", new ComboBox("Select Build Patch: ", 0, CurrentPatchs));
                 
                 BuildMenu.AddLabel($"Current Build: {lolversion.SelectedText}");
                 var minItem = BuildMenu.CreateSlider("minitem", "Min amount of Items to shop", 5, 1, 10);
