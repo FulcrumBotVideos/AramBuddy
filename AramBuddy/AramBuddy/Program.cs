@@ -231,12 +231,6 @@ namespace AramBuddy
                 var lolversion = BuildMenu.Add("buildpatch", new ComboBox("Select Build Patch: ", 0, CurrentPatchs));
                 
                 BuildMenu.AddLabel($"Current Build: {lolversion.SelectedText}");
-                var minItem = BuildMenu.CreateSlider("minitem", "Min amount of Items to shop", 5, 1, 10);
-                var maxItem = BuildMenu.CreateSlider("maxitem", "Max amount of Items to shop", 10, minItem.CurrentValue, 25);
-                minItem.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs args)
-                    { maxItem.MinValue = minItem.MaxValue; };
-                maxItem.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs args)
-                    { minItem.MaxValue = args.NewValue; };
 
                 var debug = MenuIni.CreateCheckBox("debug", "Enable Debugging Mode");
                 var activator = MenuIni.CreateCheckBox("activator", "Enable Built-In Activator");
@@ -315,10 +309,6 @@ namespace AramBuddy
                         savechat.CurrentValue = false;
                         tyler1.CurrentValue = false;
                         tyler1g.CurrentValue = 3000;
-
-                        //autoshop
-                        minItem.CurrentValue = 5;
-                        maxItem.CurrentValue = 10;
                     }
                 };
 
