@@ -1811,6 +1811,29 @@ namespace GenesisSpellLibrary.Spells
         }
     }
 
+    public class Rakan : SpellBase
+    {
+        public sealed override Spell.SpellBase Q { get; set; }
+
+        public sealed override Spell.SpellBase W { get; set; }
+
+        public sealed override Spell.SpellBase E { get; set; }
+
+        public sealed override Spell.SpellBase R { get; set; }
+
+        public Rakan()
+        {
+            this.Q = new Spell.Skillshot(SpellSlot.Q, 800, SkillShotType.Linear, 250, 1850, 70, DamageType.Magical);
+            this.W = new Spell.Skillshot(SpellSlot.W, 650, SkillShotType.Circular, 500, int.MaxValue, 250, DamageType.Magical);
+            this.E = new Spell.Targeted(SpellSlot.E, 400);
+            this.R = new Spell.Active(SpellSlot.R, 300);
+            this.WisCC = true;
+            this.RisSaver = true;
+            this.EisDash = true;
+            this.EisSaver = true;
+        }
+    }
+
     public class RekSai : SpellBase
     {
         public sealed override Spell.SpellBase Q { get; set; }
@@ -2692,6 +2715,25 @@ namespace GenesisSpellLibrary.Spells
             this.R = new Spell.Active(SpellSlot.R, 350);
             this.RisCC = true;
             this.EisDangerDash = true;
+        }
+    }
+
+    public class Xayah : SpellBase
+    {
+        public sealed override Spell.SpellBase Q { get; set; }
+
+        public sealed override Spell.SpellBase W { get; set; }
+
+        public sealed override Spell.SpellBase E { get; set; }
+
+        public sealed override Spell.SpellBase R { get; set; }
+
+        public Xayah()
+        {
+            this.Q = new Spell.Skillshot(SpellSlot.Q, 1100, SkillShotType.Linear, 250, 4000, 60, DamageType.Physical) { AllowedCollisionCount = int.MaxValue };
+            this.W = new Spell.Active(SpellSlot.W, 1000, DamageType.Physical);
+            this.E = new Spell.Skillshot(SpellSlot.E, int.MaxValue, SkillShotType.Linear, 250, 4000, 60) { AllowedCollisionCount = int.MaxValue };
+            this.R = new Spell.Skillshot(SpellSlot.R, 1100, SkillShotType.Cone, 1000, 5000, 60, DamageType.Physical) {ConeAngleDegrees = 35};
         }
     }
 

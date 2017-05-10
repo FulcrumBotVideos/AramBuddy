@@ -28,7 +28,7 @@ namespace AramBuddy
 {
     internal class Program
     {
-        public static string[] CurrentPatchs =  { "7.6.1", "7.5.1", "7.2.1", "7.1.1" };
+        public static string[] CurrentPatchs =  { "7.9.1", "7.6.1", "7.5.1", "7.2.1", "7.1.1" };
 
         private static string Texturefile = Misc.AramBuddyFolder + "\\temp\\DisableTexture1.dat";
 

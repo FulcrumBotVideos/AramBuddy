@@ -59,6 +59,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Plugins\AutoShop\Build.cs" />
@@ -120,6 +121,8 @@
     <Compile Include="GenesisSpellDatabase\SpellManager.cs" />
     <Compile Include="GenesisSpellDatabase\Spells\SpellBase.cs" />
     <Compile Include="GenesisSpellDatabase\Spells\Spells.cs" />
+    <Compile Include="Plugins\Champions\Xayah\Xayah.cs" />
+    <Compile Include="Plugins\Champions\Xayah\XayahFeather.cs" />
     <Compile Include="Plugins\KappaEvade\Collision.cs" />
     <Compile Include="Plugins\KappaEvade\Database.cs" />
     <Compile Include="Plugins\KappaEvade\KappaEvade.cs" />
