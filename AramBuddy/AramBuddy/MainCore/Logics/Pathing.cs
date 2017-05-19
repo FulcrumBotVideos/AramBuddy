@@ -21,7 +21,7 @@ namespace AramBuddy.MainCore.Logics
         /// <summary>
         ///     Picking best Position to move to.
         /// </summary>
-        public static void BestPosition()
+        public static Vector3 BestPosition()
         {
             if (EnableTeleport && ObjectsManager.ClosestAlly != null)
             {
@@ -37,19 +37,19 @@ namespace AramBuddy.MainCore.Logics
                 {
                     Program.Moveto = "ZombieTarget";
                     Position = ZombieTarget.PredictPosition();
-                    return;
+                    return Position;
                 }
                 if (ObjectsManager.NearestEnemy != null)
                 {
                     Program.Moveto = "NearestEnemy";
                     Position = ObjectsManager.NearestEnemy.PredictPosition();
-                    return;
+                    return Position;
                 }
                 if (ObjectsManager.NearestEnemyMinion != null)
                 {
                     Program.Moveto = "NearestEnemyMinion";
                     Position = ObjectsManager.NearestEnemyMinion.PredictPosition();
-                    return;
+                    return Position;
                 }
             }
 
@@ -82,12 +82,12 @@ namespace AramBuddy.MainCore.Logics
                         if (healthRelic.Name.Contains("Bard") && !formana)
                         {
                             Program.Moveto = "BardShrine";
-                            Position = healthRelic.Position;
-                            return;
+                            Position = healthRelic.Position.Random(MyHero.Instance.BoundingRadius);
+                            return Position;
                         }
                         Program.Moveto = "HealthRelic";
-                        Position = healthRelic.Position;
-                        return;
+                        Position = healthRelic.Position.Random(MyHero.Instance.BoundingRadius);
+                        return Position;
                     }
                 }
             }
@@ -97,8 +97,8 @@ namespace AramBuddy.MainCore.Logics
             if (PickBardChimes && BardChime != null)
             {
                 Program.Moveto = "BardChime";
-                Position = BardChime.Position.Random();
-                return;
+                Position = BardChime.Position.Random(MyHero.Instance.BoundingRadius);
+                return Position;
             }
 
             // Pick Thresh Lantern
@@ -115,28 +115,28 @@ namespace AramBuddy.MainCore.Logics
                     Program.Moveto = "ThreshLantern";
                     Player.UseObject(ThreshLantern);
                 }
-                return;
+                return Position;
             }
 
             if (PickDravenAxe && ObjectsManager.DravenAxe != null)
             {
                 Program.Moveto = "DravenAxe";
                 Position = ObjectsManager.DravenAxe.Position;
-                return;
+                return Position;
             }
 
             if (PickOlafAxe && ObjectsManager.OlafAxe != null)
             {
                 Program.Moveto = "OlafAxe";
                 Position = ObjectsManager.OlafAxe.Position;
-                return;
+                return Position;
             }
 
             if (PickZacBlops && ObjectsManager.ZacBlop != null)
             {
                 Program.Moveto = "ZacBlop";
                 Position = ObjectsManager.ZacBlop.Position;
-                return;
+                return Position;
             }
             
             /* fix core pls not working :pepe:
@@ -157,7 +157,7 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "FarthestAllyToFollow";
                 Position = ObjectsManager.FarthestAllyToFollow.PredictPosition().Random();
-                return;
+                return Position;
             }
 
             // Stays Under tower if the bot health under 10%.
@@ -168,13 +168,13 @@ namespace AramBuddy.MainCore.Logics
                 {
                     Program.Moveto = "SafeAllyTurretFlee";
                     Position = ObjectsManager.SafeAllyTurret.PredictPosition().Random().Extend(ObjectsManager.AllySpawn.Position.Random(), 400).To3D();
-                    return;
+                    return Position;
                 }
                 if (ObjectsManager.AllySpawn != null)
                 {
                     Program.Moveto = "AllySpawnFlee";
                     Position = ObjectsManager.AllySpawn.Position.Random();
-                    return;
+                    return Position;
                 }
             }
 
@@ -183,23 +183,16 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "AllySpawn2";
                 Position = ObjectsManager.AllySpawn.Position.Random();
-                return;
+                return Position;
             }
-            
-            if (Player.Instance.GetAutoAttackRange() < 425)
-            {
-                MeleeLogic();
-            }
-            else
-            {
-                RangedLogic();
-            }
+
+            return Position = Player.Instance.GetAutoAttackRange() < 425 ? MeleeLogic() : RangedLogic();
         }
 
         /// <summary>
         ///     Melee Champions Logic.
         /// </summary>
-        public static bool MeleeLogic()
+        public static Vector3 MeleeLogic()
         {
             var AllySpawn = ObjectsManager.AllySpawn;
 
@@ -217,7 +210,7 @@ namespace AramBuddy.MainCore.Logics
                     {
                         Program.Moveto = "NearestEnemyToNearestAlly";
                         Position = pos;
-                        return true;
+                        return pos;
                     }
                 }
                 
@@ -229,7 +222,7 @@ namespace AramBuddy.MainCore.Logics
                     {
                         Program.Moveto = "NearestEnemyToAllySpawn";
                         Position = pos;
-                        return true;
+                        return Position;
                     }
                 }
             }
@@ -247,7 +240,7 @@ namespace AramBuddy.MainCore.Logics
                     {
                         Program.Moveto = "EnemyUnderTurret";
                         Position = enemy.KitePos(AllySpawn);
-                        return true;
+                        return Position;
                     }
                 }
             }
@@ -287,21 +280,21 @@ namespace AramBuddy.MainCore.Logics
                             {
                                 Program.Moveto = "NearestEnemyObject";
                                 Position = extendtopos;
-                                return true;
+                                return Position;
                             }
                         }
                         if (!TurretCircle.Points.Any(p => rect.IsInside(p)))
                         {
                             Program.Moveto = "NearestEnemyObject2";
                             Position = extendtopos;
-                            return true;
+                            return Position;
                         }
                     }
                     else
                     {
                         Program.Moveto = "NearestEnemyObject3";
                         Position = extendtopos;
-                        return true;
+                        return Position;
                     }
                 }
             }
@@ -311,7 +304,7 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "NearestEnemyMinion";
                 Position = ObjectsManager.NearestEnemyMinion.PredictPosition().Extend(AllySpawn.Position.Random(), KiteDistance(ObjectsManager.NearestEnemyMinion)).To3D();
-                return true;
+                return Position;
             }
 
             // if SafestAllyToFollow not exsist picks other to follow.
@@ -320,7 +313,7 @@ namespace AramBuddy.MainCore.Logics
                 // if SafestAllyToFollow exsist follow BestAllyToFollow.
                 Program.Moveto = "SafestAllyToFollow";
                 Position = ObjectsManager.SafestAllyToFollow.PredictPosition().Random();
-                return true;
+                return Position;
             }
             
             // if Minion exsists moves to Minion.
@@ -328,7 +321,7 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "AllyMinion";
                 Position = ObjectsManager.AllyMinion.PredictPosition().Random();
-                return true;
+                return Position;
             }
 
             // if FarthestAllyToFollow exsists moves to FarthestAllyToFollow.
@@ -336,7 +329,7 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "FarthestAllyToFollow";
                 Position = ObjectsManager.FarthestAllyToFollow.PredictPosition().Random();
-                return true;
+                return Position;
             }
 
             // if SecondTurret exsists moves to SecondTurret.
@@ -344,7 +337,7 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "SecondTurret";
                 Position = ObjectsManager.SecondTurret.PredictPosition().Extend(AllySpawn, 400).To3D().Random();
-                return true;
+                return Position;
             }
 
             // if SafeAllyTurret exsists moves to SafeAllyTurret.
@@ -352,7 +345,7 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "SafeAllyTurret";
                 Position = ObjectsManager.SafeAllyTurret.ServerPosition.Extend(AllySpawn, 400).To3D().Random();
-                return true;
+                return Position;
             }
 
             // if ClosesetAllyTurret exsists moves to ClosesetAllyTurret.
@@ -360,7 +353,7 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "ClosesetAllyTurret";
                 Position = ObjectsManager.ClosesetAllyTurret.ServerPosition.Extend(AllySpawn, 400).To3D().Random();
-                return true;
+                return Position;
             }
 
             // Well if it ends up like this then best thing is to let it end.
@@ -368,15 +361,15 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "AllySpawn3";
                 Position = AllySpawn.Position.Random();
-                return true;
+                return Position;
             }
-            return false;
+            return Vector3.Zero;
         }
 
         /// <summary>
         ///     Ranged Champions Logic.
         /// </summary>
-        public static bool RangedLogic()
+        public static Vector3 RangedLogic()
         {
             var NearestEnemy = ObjectsManager.NearestEnemy;
 
@@ -389,7 +382,7 @@ namespace AramBuddy.MainCore.Logics
                 {
                     Program.Moveto = "KiteNearestEnemy";
                     Position = pos;
-                    return true;
+                    return Position;
                 }
             }
 
@@ -404,7 +397,7 @@ namespace AramBuddy.MainCore.Logics
                     {
                         Program.Moveto = "DefendingTower";
                         Position = enemy.KitePos(ObjectsManager.AllySpawn);
-                        return true;
+                        return Position;
                     }
                 }
             }
@@ -420,7 +413,7 @@ namespace AramBuddy.MainCore.Logics
                 {
                     Program.Moveto = "DefendingInhbitor";
                     Position = enemy.KitePos(ObjectsManager.AllySpawn);
-                    return true;
+                    return Position;
                 }
             }
 
@@ -458,21 +451,21 @@ namespace AramBuddy.MainCore.Logics
                             {
                                 Program.Moveto = "NearestEnemyObject";
                                 Position = extendtopos;
-                                return true;
+                                return Position;
                             }
                         }
                         if (!TurretCircle.Points.Any(p => rect.IsInside(p)))
                         {
                             Program.Moveto = "NearestEnemyObject2";
                             Position = extendtopos;
-                            return true;
+                            return Position;
                         }
                     }
                     else
                     {
                         Program.Moveto = "NearestEnemyObject3";
                         Position = extendtopos;
-                        return true;
+                        return Position;
                     }
                 }
             }
@@ -483,7 +476,7 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "NearestEnemyMinion";
                 Position = NearestEnemyMinion.PredictPosition().Extend(ObjectsManager.AllySpawn.Position.Random(), KiteDistance(NearestEnemyMinion)).To3D();
-                return true;
+                return Position;
             }
 
             // if SafestAllyToFollow2 exsists moves to SafestAllyToFollow2.
@@ -491,7 +484,7 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "SafestAllyToFollow2";
                 Position = ObjectsManager.SafestAllyToFollow2.PredictPosition().Extend(ObjectsManager.AllySpawn, 100).Random();
-                return true;
+                return Position;
             }
             
             // if Minion not exsist picks other to follow.
@@ -499,7 +492,7 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "AllyMinion";
                 Position = ObjectsManager.AllyMinion.PredictPosition().Extend(ObjectsManager.AllySpawn, 100).Random();
-                return true;
+                return Position;
             }
             
             // if SecondTurret exsists moves to SecondTurret.
@@ -507,7 +500,7 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "SecondTurret";
                 Position = ObjectsManager.SecondTurret.ServerPosition.Extend(ObjectsManager.AllySpawn, 425).To3D().Random();
-                return true;
+                return Position;
             }
 
             // if SafeAllyTurret exsists moves to SafeAllyTurret.
@@ -515,7 +508,7 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "SafeAllyTurret";
                 Position = ObjectsManager.SafeAllyTurret.ServerPosition.Extend(ObjectsManager.AllySpawn, 425).To3D().Random();
-                return true;
+                return Position;
             }
 
             // if ClosesetAllyTurret exsists moves to ClosesetAllyTurret.
@@ -523,7 +516,7 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "ClosesetAllyTurret";
                 Position = ObjectsManager.ClosesetAllyTurret.ServerPosition.Extend(ObjectsManager.AllySpawn, 425).To3D().Random();
-                return true;
+                return Position;
             }
 
             // Well if it ends up like this then best thing is to let it end.
@@ -531,9 +524,9 @@ namespace AramBuddy.MainCore.Logics
             {
                 Program.Moveto = "AllySpawn3";
                 Position = ObjectsManager.AllySpawn.Position.Random();
-                return true;
+                return Position;
             }
-            return false;
+            return Vector3.Zero;
         }
 
         /// <summary>
@@ -541,6 +534,9 @@ namespace AramBuddy.MainCore.Logics
         /// </summary>
         public static void MoveTo(Vector3 pos)
         {
+            if(pos.IsZero)
+                return;
+
             var pos2 = pos;
             var rnd = new Random().Next(750, 2000);
             if (Player.Instance.Distance(pos) > rnd)

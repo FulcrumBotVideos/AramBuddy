@@ -37,7 +37,7 @@ namespace AramBuddy.Plugins.Champions.Taric
             if (E == null || sender == null || !sender.IsEnemy || !sender.IsKillable(E.Range) || !E.IsReady())
                 return;
 
-            E.Cast(sender, HitChance.High);
+            E.Cast(sender.ServerPosition);
         }
 
         public override void Active()
@@ -82,7 +82,7 @@ namespace AramBuddy.Plugins.Champions.Taric
             {
                 foreach (var target in EntityManager.Heroes.Enemies.Where(m => E.WillKill(m) && m.IsKillable(E.Range)))
                 {
-                    E.Cast(target, 45);
+                    E.Cast(target.ServerPosition);
                 }
             }
         }

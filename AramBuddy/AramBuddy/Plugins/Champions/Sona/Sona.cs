@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using AramBuddy.MainCore.Common;
-using AramBuddy.MainCore.Utility;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;

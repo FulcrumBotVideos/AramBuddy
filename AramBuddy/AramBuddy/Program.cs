@@ -78,14 +78,14 @@ namespace AramBuddy
                     return;
                 }
 
-                textsize = Drawing.Width <= 1280 || Drawing.Height <= 720 ? 10F : 40F;
+                textsize = (Drawing.Width + Drawing.Height) * 0.02f;
                 text = new Text("YOUR ORBWALKER IS DISABLED", new Font("Euphemia", textsize, FontStyle.Bold)) { Color = System.Drawing.Color.White, Position = new Vector2(Drawing.Width * 0.3f, Drawing.Height * 0.2f) };
 
                 Chat.OnClientSideMessage += delegate (ChatClientSideMessageEventArgs eventArgs)
                 {
                     if (eventArgs.Message.ToLower().Contains("portaio") && !CrashAIODetected)
                     {
-                        var warnmsg = "AramBuddy Does not Work With CrashAIO\nDisable CrashAIO In order to use AramBuddy !";
+                        var warnmsg = "AramBuddy Does not Work With PortAIO\nDisable PortAIO In order to use AramBuddy !";
                         Chat.Print(warnmsg);
                         Logger.Send(warnmsg, Logger.LogLevel.Warn);
                         Notifications.Show(new SimpleNotification("AramBuddy", warnmsg), 20000);
@@ -181,21 +181,7 @@ namespace AramBuddy
                 }
 
                 if (EnableCustomPlugins)
-                {
-                    try
-                    {
-                        if ((Base)Activator.CreateInstance(null, "AramBuddy.Plugins.Champions." + Player.Instance.Hero + "." + Player.Instance.Hero).Unwrap() != null)
-                        {
-                            CustomChamp = true;
-                            Logger.Send("Loaded Custom Champion " + Player.Instance.Hero);
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        CustomChamp = false;
-                        Logger.Send("There Is No Custom Plugin For " + Player.Instance.Hero, Logger.LogLevel.Warn);
-                    }
-                }
+                    loadPlugin();
 
                 // Sends Start / End Msg
                 Chatting.Init();
@@ -213,6 +199,23 @@ namespace AramBuddy
             catch (Exception ex)
             {
                 Logger.Send("Program Error At Init", ex, Logger.LogLevel.Error);
+            }
+        }
+
+        private static void loadPlugin()
+        {
+            try
+            {
+                if ((Base)Activator.CreateInstance(null, "AramBuddy.Plugins.Champions." + Player.Instance.Hero + "." + Player.Instance.Hero).Unwrap() != null)
+                {
+                    CustomChamp = true;
+                    Logger.Send("Loaded Custom Champion " + Player.Instance.Hero);
+                }
+            }
+            catch (Exception)
+            {
+                CustomChamp = false;
+                Logger.Send("There Is No Custom Plugin For " + Player.Instance.Hero, Logger.LogLevel.Warn);
             }
         }
 
@@ -388,108 +391,102 @@ namespace AramBuddy
         
         private static void Drawing_OnEndScene(EventArgs args)
         {
-            try
+            if (CrashAIODetected || text == null)
+                return;
+
+            if (!Loaded)
             {
-                if(CrashAIODetected) return;
-
-                if (!Loaded)
-                {
-                    text.TextValue = $"AramBuddy Starting in: {(int)((Timer*1000 + TimeToStart - Game.Time*1000)/1000) + 1}";
-                    text.Position = new Vector2(Drawing.Width * 0.3f, Drawing.Height * 0.2f);
-                    text.Draw();
-                    return;
-                }
-
-                if (Orbwalker.DisableMovement && !MainCore.Logics.Casting.SpecialChamps.IsCastingImportantSpell)
-                {
-                    text.TextValue = "YOUR ORBWALKER IS DISABLED\nTHE BOT WILL NOT WORK\nMAKE SURE TO UNTICK\nDISABLE MOVING TO MOUSE";
-                    text.Position = new Vector2(Drawing.Width * 0.3f, Drawing.Height * 0.2f);
-                    text.Draw();
-                }
-
-                if (!EnableDebug)
-                    return;
-
-                var AllyTeamTotal = " | AllyTeamTotal: " + (int)Player.Instance.PredictPosition().TeamTotal();
-                var EnemyTeamTotal = " | EnemyTeamTotal: " + (int)Player.Instance.PredictPosition().TeamTotal(true);
-                var MoveTo = " | MoveTo: " + Moveto;
-                var ActiveMode = " | ActiveMode: " + ModesManager.CurrentMode;
-                var Alone = " | Alone: " + Brain.Alone();
-                var AttackObject = " | AttackObject: " + ModesManager.AttackObject;
-                var LastTurretAttack = " | LastTurretAttack: " + (Core.GameTickCount - MyHero.LastTurretAttack);
-                var SafeToDive = " | SafeToDive: " + Misc.SafeToDive;
-                var castingimportantspell = " | IsCastingImportantSpell: " + MainCore.Logics.Casting.SpecialChamps.IsCastingImportantSpell;
-                var lagging = " | Lagging: " + Brain.Lagging;
-                var SafeToAttack = " | SafeToAttack: " + Misc.SafeToAttack;
-                var IsSafe = /*" | IsSafe: " + (Player.Instance.IsSafe() && Pathing.Position.IsSafe())*/ "";
-                var LastTeamFight = " | LastTeamFight: " + (int)(Core.GameTickCount - Brain.LastTeamFight);
-                var MovementCommands = " | Movement Commands Issued: " + MoveToCommands;
-                var nextitem = " | Next Item: " + Buy.CurrentItemIndex + " - " + Buy.NextItem + " | Value: " + Buy.NextItemValue;
-                var fullbuild = " | FullBuild: " + Buy.FullBuild;
-
-                Drawing.DrawText(Drawing.Width * 0.2f, Drawing.Height * 0.025f, System.Drawing.Color.White,
-                    AllyTeamTotal + EnemyTeamTotal + "\n"
-                    + ActiveMode + Alone + AttackObject + "\n"
-                    + SafeToDive + SafeToAttack + IsSafe + "\n"
-                    + castingimportantspell + lagging + "\n"
-                    + LastTurretAttack + LastTeamFight + "\n"
-                    + MovementCommands + MoveTo + "\n"
-                    + nextitem + fullbuild + "\n");
-
-                Drawing.DrawText(
-                    Game.CursorPos.WorldToScreen().X + 50,
-                    Game.CursorPos.WorldToScreen().Y,
-                    System.Drawing.Color.Goldenrod,
-                    (Game.CursorPos.TeamTotal() - Game.CursorPos.TeamTotal(true)).ToString(CultureInfo.CurrentCulture) + "\n" 
-                    /*+ "KDA: " + Player.Instance.KDA() +" [" + Player.Instance.ChampionsKilled + ", " + Player.Instance.Assists + ", " + Player.Instance.Deaths + "]"*/,
-                    5);
-
-                foreach (var hr in ObjectsManager.HealthRelics.Where(h => h.IsValid && !h.IsDead))
-                {
-                    Circle.Draw(Color.GreenYellow, hr.BoundingRadius + Player.Instance.BoundingRadius, hr.Position);
-                }
-                
-                if (Pathing.Position != null && Pathing.Position != Vector3.Zero && Pathing.Position.IsValid())
-                {
-                    Circle.Draw(Color.White, 100, Pathing.Position);
-                }
-
-                if (!DisableSpellsCasting && ModesManager.Spelllist != null)
-                {
-                    foreach (var spell in ModesManager.Spelllist.Where(s => s != null))
-                    {
-                        Circle.Draw(spell.IsReady() ? Color.Chartreuse : Color.OrangeRed, (spell as Spell.Chargeable)?.MaximumRange ?? spell.Range, Player.Instance);
-                    }
-                }
-
-                if (PickBardChimes)
-                {
-                    foreach (var chime in ObjectsManager.BardChimes.Where(c => Player.Instance.Hero == Champion.Bard && c.IsValid && !c.IsDead))
-                    {
-                        Circle.Draw(Color.Goldenrod, chime.BoundingRadius + Player.Instance.BoundingRadius, chime.Position);
-                    }
-                }
-
-                if (EnableEvade)
-                {
-                    foreach (var trap in ObjectsManager.EnemyTraps)
-                    {
-                        Circle.Draw(Color.OrangeRed, trap.Trap.BoundingRadius * 3, trap.Trap.Position);
-                    }
-                    /*
-                    foreach (var p in KappaEvade.dangerPolygons)
-                    {
-                        p.Draw(System.Drawing.Color.AliceBlue, 2);
-                    }*/
-                }
-
-                if (Player.Instance.Hero == Champion.Zac)
-                    ObjectsManager.ZacPassives.ForEach(p => Circle.Draw(Color.AliceBlue, 100, p));
+                text.TextValue = $"AramBuddy Starting in: {(int)((Timer * 1000 + TimeToStart - Game.Time * 1000) / 1000) + 1}";
+                text.Position = new Vector2(Drawing.Width * 0.3f, Drawing.Height * 0.2f);
+                text?.Draw();
+                return;
             }
-            catch (Exception ex)
+
+            if ((Orbwalker.DisableMovement || Orbwalker.DisableAttacking) && !MainCore.Logics.Casting.SpecialChamps.IsCastingImportantSpell)
             {
-                Logger.Send("Program Error At Drawing_OnEndScene", ex, Logger.LogLevel.Error);
+                text.TextValue = "YOUR ORBWALKER IS DISABLED\nTHE BOT WILL NOT WORK\nMAKE SURE TO UNTICK\nDISABLE MOVING TO MOUSE";
+                text.Position = new Vector2(Drawing.Width * 0.3f, Drawing.Height * 0.2f);
+                text?.Draw();
             }
+
+            if (!EnableDebug)
+                return;
+
+            var AllyTeamTotal = " | AllyTeamTotal: " + (int)Player.Instance.PredictPosition().TeamTotal();
+            var EnemyTeamTotal = " | EnemyTeamTotal: " + (int)Player.Instance.PredictPosition().TeamTotal(true);
+            var MoveTo = " | MoveTo: " + Moveto;
+            var ActiveMode = " | ActiveMode: " + ModesManager.CurrentMode;
+            var Alone = " | Alone: " + Brain.Alone();
+            var AttackObject = " | AttackObject: " + ModesManager.AttackObject;
+            var LastTurretAttack = " | LastTurretAttack: " + (Core.GameTickCount - MyHero.LastTurretAttack);
+            var SafeToDive = " | SafeToDive: " + Misc.SafeToDive;
+            var castingimportantspell = " | IsCastingImportantSpell: " + MainCore.Logics.Casting.SpecialChamps.IsCastingImportantSpell;
+            var lagging = " | Lagging: " + Brain.Lagging;
+            var SafeToAttack = " | SafeToAttack: " + Misc.SafeToAttack;
+            var IsSafe = /*" | IsSafe: " + (Player.Instance.IsSafe() && Pathing.Position.IsSafe())*/ "";
+            var LastTeamFight = " | LastTeamFight: " + (int)(Core.GameTickCount - Brain.LastTeamFight);
+            var MovementCommands = " | Movement Commands Issued: " + MoveToCommands;
+            var nextitem = " | Next Item: " + Buy.CurrentItemIndex + " - " + Buy.NextItem + " | Value: " + Buy.NextItemValue;
+            var fullbuild = " | FullBuild: " + Buy.FullBuild;
+
+            Drawing.DrawText(Drawing.Width * 0.2f, Drawing.Height * 0.025f, System.Drawing.Color.White,
+                AllyTeamTotal + EnemyTeamTotal + "\n"
+                + ActiveMode + Alone + AttackObject + "\n"
+                + SafeToDive + SafeToAttack + IsSafe + "\n"
+                + castingimportantspell + lagging + "\n"
+                + LastTurretAttack + LastTeamFight + "\n"
+                + MovementCommands + MoveTo + "\n"
+                + nextitem + fullbuild + "\n");
+
+            Drawing.DrawText(
+                Game.CursorPos.WorldToScreen().X + 50,
+                Game.CursorPos.WorldToScreen().Y,
+                System.Drawing.Color.Goldenrod,
+                (Game.CursorPos.TeamTotal() - Game.CursorPos.TeamTotal(true)).ToString(CultureInfo.CurrentCulture) + "\n"
+                /*+ "KDA: " + Player.Instance.KDA() +" [" + Player.Instance.ChampionsKilled + ", " + Player.Instance.Assists + ", " + Player.Instance.Deaths + "]"*/,
+                5);
+
+            foreach (var hr in ObjectsManager.HealthRelics.Where(h => h.IsValid && !h.IsDead))
+            {
+                Circle.Draw(Color.GreenYellow, hr.BoundingRadius + Player.Instance.BoundingRadius, hr.Position);
+            }
+
+            if (Pathing.Position != null && Pathing.Position != Vector3.Zero && Pathing.Position.IsValid())
+            {
+                Circle.Draw(Color.White, 100, Pathing.Position);
+            }
+
+            if (!DisableSpellsCasting && ModesManager.Spelllist != null)
+            {
+                foreach (var spell in ModesManager.Spelllist.Where(s => s != null))
+                {
+                    Circle.Draw(spell.IsReady() ? Color.Chartreuse : Color.OrangeRed, (spell as Spell.Chargeable)?.MaximumRange ?? spell.Range, Player.Instance);
+                }
+            }
+
+            if (PickBardChimes)
+            {
+                foreach (var chime in ObjectsManager.BardChimes.Where(c => Player.Instance.Hero == Champion.Bard && c.IsValid && !c.IsDead))
+                {
+                    Circle.Draw(Color.Goldenrod, chime.BoundingRadius + Player.Instance.BoundingRadius, chime.Position);
+                }
+            }
+
+            if (EnableEvade)
+            {
+                foreach (var trap in ObjectsManager.EnemyTraps)
+                {
+                    Circle.Draw(Color.OrangeRed, trap.Trap.BoundingRadius * 3, trap.Trap.Position);
+                }
+                /*
+                foreach (var p in KappaEvade.dangerPolygons)
+                {
+                    p.Draw(System.Drawing.Color.AliceBlue, 2);
+                }*/
+            }
+
+            if (Player.Instance.Hero == Champion.Zac)
+                ObjectsManager.ZacPassives.ForEach(p => Circle.Draw(Color.AliceBlue, 100, p));
         }
 
         private static void Game_OnTick(EventArgs args)

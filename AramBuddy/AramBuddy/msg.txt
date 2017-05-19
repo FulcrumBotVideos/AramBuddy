@@ -1,1 +1,1 @@
-Updated builds to 7.9 and Added new champions
+Add Ryze and Teemo Plugins, and bug fixes

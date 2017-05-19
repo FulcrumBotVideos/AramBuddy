@@ -65,7 +65,7 @@ namespace AramBuddy.MainCore.Common
 
                 foreach (var t in Aturrets)
                 {
-                    AllyTeamTotal += t.Health * 0.45f;
+                    AllyTeamTotal += t.Health * 0.15f;
                     AllyTeamTotal += t.Armor;
                     AllyTeamTotal += t.SpellBlock;
                     AllyTeamTotal += t.GetAutoAttackDamage(Player.Instance) * 2;
@@ -82,7 +82,7 @@ namespace AramBuddy.MainCore.Common
 
                 foreach (var t in Eturrets)
                 {
-                    EnemyTeamTotal += t.Health * 0.45f;
+                    EnemyTeamTotal += t.Health * 0.15f;
                     EnemyTeamTotal += t.Armor;
                     EnemyTeamTotal += t.SpellBlock;
                     EnemyTeamTotal += t.GetAutoAttackDamage(Player.Instance) * 2;
@@ -605,7 +605,7 @@ namespace AramBuddy.MainCore.Common
         {
             get
             {
-                return 100; //Game.FPS < 60 && !Game.FPS.Equals(25) ? Game.FPS * 2 : Game.FPS;
+                return 125; //Game.FPS < 60 && !Game.FPS.Equals(25) ? Game.FPS * 2 : Game.FPS;
             }
         }
         
@@ -1085,11 +1085,11 @@ namespace AramBuddy.MainCore.Common
         /// <summary>
         ///     Randomize Vector3.
         /// </summary>
-        public static Vector3 Random(this Vector3 pos)
+        public static Vector3 Random(this Vector3 pos, float randomValue = 200)
         {
             var rnd = new Random();
-            var X = rnd.Next((int)(pos.X - 200), (int)(pos.X + 200));
-            var Y = rnd.Next((int)(pos.Y - 200), (int)(pos.Y + 200));
+            var X = rnd.Next((int)(pos.X - randomValue), (int)(pos.X + randomValue));
+            var Y = rnd.Next((int)(pos.Y - randomValue), (int)(pos.Y + randomValue));
             return new Vector3(X, Y, pos.Z);
         }
 

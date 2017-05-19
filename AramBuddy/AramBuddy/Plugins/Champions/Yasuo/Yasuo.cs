@@ -91,18 +91,12 @@ namespace AramBuddy.Plugins.Champions.Yasuo
 
             ComboMenu.CreateCheckBox("RAOE", "Enable Combo R AOE");
             ComboMenu.CreateSlider("Rhits", "Combo R AOE Hit", 2, 1, 6);
-
-            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+            
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
             Gapcloser.OnGapcloser += Gapcloser_OnGapcloser;
             E.OnSpellCasted +=(spell, args) => args.Process = user.PredictHealthPercent() > 50;
         }
-
-        private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            UpdateSpells();
-        }
-
+        
         private static void Gapcloser_OnGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
             if (!Q3 || !Q.IsReady() || !sender.IsKillable(Q.Range) || !AutoMenu.CheckBoxValue("GapQ3"))
@@ -121,6 +115,7 @@ namespace AramBuddy.Plugins.Champions.Yasuo
 
         public override void Active()
         {
+            UpdateSpells();
             foreach (var target in EntityManager.Heroes.Enemies.Where(e => e.IsKillable(Q.Range)))
             {
                 Q3AOE(target, AutoMenu.SliderValue("Q3AOE"));
@@ -211,11 +206,12 @@ namespace AramBuddy.Plugins.Champions.Yasuo
 
         public override void LaneClear()
         {
-            if(Q3) return;
+            if(Q3)
+                return;
 
-            foreach (var m in Q.LaneMinions())
+            if (Q.IsReady() && LaneClearMenu.CheckBoxValue("Q"))
             {
-                if (Q.IsReady() && LaneClearMenu.CheckBoxValue("Q"))
+                foreach (var m in Q.LaneMinions())
                 {
                     Q.Cast(m, 45);
                 }
